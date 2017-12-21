@@ -5,6 +5,7 @@ var okBtn = document.getElementsByClassName('ok-btn')[0];
 var cityBlock = document.getElementsByClassName('city-block')[0];
 var result = document.getElementsByClassName('result')[0];
 var notification = document.getElementsByClassName('notification')[0];
+var all;
 
 localStorage.setItem('val_1', 'архангельск');
 localStorage.setItem('val_2', 'киев');
@@ -18,15 +19,31 @@ okBtn.addEventListener('click', write);
 
 function write(){
 
-    // var all = cityBlock.getElementsByTagName('p');
-    // console.log(all);
-    var p = document.createElement('p');
+    let p = document.createElement('p');
     p.innerHTML = yourCity.value;
+    
+    // проверка 1й буквы пользователя
+    if (compCity.value){        
+        var letter_1 = opponent(compCity.value);
+        if(yourCity.value[0] == letter_1){
+            console.log('great');
+            cityBlock.appendChild(p);
+            makeComputerAnswer()
+        } else {            
+            var par = document.createElement('p');
+            par.innerHTML = `Слово должно начинаться с буквы ${letter_1} !!!`;
+            notification.appendChild(par);
+            setTimeout(()=> { par.innerHTML = ''}, 5000);
+        }
+    } else{
+        cityBlock.appendChild(p);
+        makeComputerAnswer()
+    }    
+};
 
-
-
-    cityBlock.appendChild(p);
-    var answer = opponent(yourCity.value);
+function makeComputerAnswer(){
+    let letter = opponent(yourCity.value);
+    let answer = opponentAnswer(letter);
 
     if (answer) {
         var next = document.createElement('p');
@@ -42,9 +59,10 @@ function write(){
 
     checkLocal(yourCity.value);
     yourCity.value = '' ;
-    
-};
-// ------------------------
+}
+
+// проверка есть ли такой  города в локал сторадж, если нет, добавляет
+
 function checkLocal(value){
        
     var string = JSON.stringify(localStorage);    
@@ -64,16 +82,20 @@ function checkLocal(value){
     }    
 }
 
+// определяет последнюю букву
 function opponent(str){    
     if (str[str.length-1] == 'ы' || str[str.length-1] == 'й' || str[str.length-1] == 'ь' || str[str.length-1] == 'ъ'){
-       var first = str[str.length-2];
-       return opponentAnswer(first); 
+        var first = str[str.length-2];
+    //    return opponentAnswer(first);
+        return first;
     } else {
-       var first = str[str.length-1];
-       return opponentAnswer(first);
+        var first = str[str.length-1];
+        // return opponentAnswer(first);
+        return first;
     }
 }
 
+// по первой букве возвращает город из локал
 function opponentAnswer(first){
     for (let i = 1; i <= localStorage.length; i++){
        var name = localStorage.getItem(`val_${i}`);       
